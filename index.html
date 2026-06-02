@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulator Neuroevolusi Mobil Interaktif - JST & Algoritma Genetika</title>
+    
+    <!-- Disable browser caching for real-time local updates -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- SEO Optimization -->
+    <meta name="description" content="Simulator kendaraan otonom interaktif murni HTML/CSS/JS menggunakan Jaringan Saraf Tiruan (JST) dan Algoritma Genetika (GA) dengan visualisasi saraf realtime.">
+    <meta name="keywords" content="Neuroevolusi, Neural Network, Genetic Algorithm, AI, Simulator, JavaScript">
+    
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-wrapper">
+        
+        <!-- Header Panel -->
+        <header class="glass-panel" id="main-header">
+            <div>
+                <h1>NEUROEVOLUTION VEHICLE SIMULATOR</h1>
+                <p>Otonom kemudi berbasis Jaringan Saraf Tiruan & Algoritma Genetika</p>
+            </div>
+            <div class="version">v1.2.0-purejs</div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="dashboard-grid">
+            
+            <!-- Left Sidebar: Controls & Parameter Settings -->
+            <section class="sidebar" id="control-sidebar">
+                
+                <!-- Controls Card -->
+                <div class="glass-panel card-section" id="sim-controls-card">
+                    <h2 class="card-title">Kontrol Utama</h2>
+                    <div class="control-btn-group">
+                        <button class="primary" id="play-pause-btn" title="Mulai / Jeda Simulasi">
+                            <!-- Play Icon SVG -->
+                            <svg id="play-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            <!-- Pause Icon SVG (hidden by default in code logic if playing) -->
+                            <svg id="pause-icon" style="display:none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                            <span id="play-btn-text">Mulai</span>
+                        </button>
+                        <button class="violet" id="next-gen-btn" title="Paksa Lanjut ke Generasi Berikutnya">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 19 22 12 13 5 13 19"></polygon><polygon points="2 19 11 12 2 5 2 19"></polygon></svg>
+                            <span>Lanjut G+</span>
+                        </button>
+                    </div>
+                    <button class="danger" id="reset-btn" style="width: 100%; margin-top: 4px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                        <span>Reset Simulasi</span>
+                    </button>
+                    
+                    <div class="slider-group" style="margin-top: 6px;">
+                        <div class="slider-label">
+                            <span>Kecepatan Simulasi</span>
+                            <span class="slider-value" id="speed-val">1x</span>
+                        </div>
+                        <input type="range" id="speed-slider" min="1" max="8" value="1" step="1">
+                    </div>
+                </div>
+
+                <!-- Environment / Obstacle Preset Card -->
+                <div class="glass-panel card-section" id="env-settings-card">
+                    <h2 class="card-title">Desain Rintangan</h2>
+                    <div class="slider-group">
+                        <label for="track-select" class="slider-label" style="font-size: 0.8rem; margin-bottom: -4px;">Pilih Trek Bawaan</label>
+                        <div class="dropdown-wrapper">
+                            <select id="track-select">
+                                <option value="scurve">Sirkuit S-Curve</option>
+                                <option value="circuit">Sirkuit Oval Loop</option>
+                                <option value="maze">Sirkuit Maze Rintangan</option>
+                                <option value="sandbox">Sandbox (Kosong)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="clear-walls-btn" style="width: 100%; border-color: rgba(255, 8, 68, 0.2); color: #ff4757;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        <span>Hapus Dinding Gambar</span>
+                    </button>
+                </div>
+
+                <!-- Evolutionary GA Parameter Card -->
+                <div class="glass-panel card-section" id="evolution-params-card">
+                    <h2 class="card-title">Algoritma Evolusi</h2>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Ukuran Populasi</span>
+                            <span class="slider-value" id="pop-val">100</span>
+                        </div>
+                        <input type="range" id="pop-slider" min="10" max="250" value="100" step="10">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Tingkat Mutasi</span>
+                            <span class="slider-value" id="mut-val">10%</span>
+                        </div>
+                        <input type="range" id="mut-slider" min="1" max="50" value="10" step="1">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Jumlah Sensor Mobil</span>
+                            <span class="slider-value" id="sensor-val">5</span>
+                        </div>
+                        <input type="range" id="sensor-slider" min="3" max="9" value="5" step="2">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Jangkauan Sensor</span>
+                            <span class="slider-value" id="range-val">150px</span>
+                        </div>
+                        <input type="range" id="range-slider" min="100" max="300" value="150" step="10">
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Center Viewport: Interactive Simulation Canvas -->
+            <section class="glass-panel canvas-area" id="main-simulation-card">
+                
+                <!-- Canvas Realtime Header Stats -->
+                <div class="canvas-header">
+                    <div class="speed-badge" id="speed-badge-text">SPEED: 1x</div>
+                    <div class="canvas-stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Generasi</span>
+                            <span class="stat-value" id="stat-gen">1</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Mobil Hidup</span>
+                            <span class="stat-value" id="stat-alive">100/100</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Tembus Target</span>
+                            <span class="stat-value" id="stat-reached">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Skor Terbaik</span>
+                            <span class="stat-value" id="stat-best">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Drawing Canvas -->
+                <div class="canvas-container" id="canvas-wrapper">
+                    <canvas id="simulation-canvas"></canvas>
+                    
+                    <!-- Mouse drawing instructions pills overlay -->
+                    <div class="canvas-instruction">
+                        <div class="pill-instruction">
+                            <strong>Klik & Tarik:</strong> Menggambar Dinding Rintangan
+                        </div>
+                        <div class="pill-instruction danger">
+                            <strong>Klik Kanan / Ctrl+Klik:</strong> Pindahkan Target Merah
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Right Panel: ANN and Evolution Trend Plotters -->
+            <section class="analysis-panel" id="analysis-sidebar">
+                
+                <!-- Neural Network Visualizer -->
+                <div class="glass-panel visualizer-card nn-visualizer" id="nn-visualizer-card">
+                    <h2 class="card-title" style="margin: 16px 16px 0 16px;">Saraf Mobil Terbaik (Realtime)</h2>
+                    <div class="visualizer-canvas-container">
+                        <canvas id="network-canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Evolution Progress Chart -->
+                <div class="glass-panel visualizer-card" id="evolution-chart-card">
+                    <h2 class="card-title" style="margin: 16px 16px 0 16px;">Tren Kemajuan Evolusi</h2>
+                    <div class="visualizer-canvas-container">
+                        <canvas id="chart-canvas"></canvas>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Main Module JS Link -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
